@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Malla Interactiva Derecho 2025</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 2rem; }
+    h1 { text-align: center; color: #1e3a8a; }
+    .msg { background: #fff; border-radius: 8px; padding: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 2rem auto; max-width: 600px; }
+    .course-card {
+      background: white;
+      padding: 1rem;
+      margin: 0.5rem;
+      border-radius: 6px;
+      border-left: 6px solid #3b82f6;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .locked {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    .completed {
+      background: #bbf7d0;
+      text-decoration: line-through;
+    }
+    .credit {
+      font-size: 0.8rem;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>Malla Interactiva de Derecho</h1>
+  <div class="msg">
+    <p>Este archivo <strong>index.html</strong> está listo para usarse con GitHub Pages.</p>
+    <p>Incluye el sistema de cursos con niveles, créditos, y prerrequisitos.</p>
+    <p>Puedes seguir agregando la lógica visual y de interacción según lo configurado en tu JavaScript.</p>
+  </div>
+
+  <div id="app"></div>
+
+  <script>
+    const app = document.getElementById("app");
+    const completed = new Set(JSON.parse(localStorage.getItem("completed") || "[]"));
+
+    function allPrereqMet(course) {
+      return course.prereq.every(id => completed.has(id));
+    }
+
+    function toggleCourse(id) {
+      if (completed.has(id)) completed.delete(id);
+      else completed.add(id);
+      localStorage.setItem("completed", JSON.stringify([...completed]));
+      renderCourses();
+    }
+
+    function renderCourses() {
+      app.innerHTML = "";
+      const grouped = {};
+      courses.forEach(c => {
+        if (!grouped[c.level]) grouped[c.level] = [];
+        grouped[c.level].push(c);
+      });
+      Object.keys(grouped).sort((a,b)=>a-b).forEach(level => {
+        const section = document.createElement("section");
+        const h2 = document.createElement("h2");
+        h2.textContent = `Nivel ${level}`;
+        section.appendChild(h2);
+
+        grouped[level].forEach(course => {
+          const div = document.createElement("div");
+          div.className = "course-card";
+          if (!allPrereqMet(course)) div.classList.add("locked");
+          if (completed.has(course.id)) div.classList.add("completed");
+          div.innerHTML = `<strong>${course.name}</strong><br><span class='credit'>${course.credits} créditos – ${course.area}</span>`;
+          div.onclick = () => { if (!div.classList.contains("locked")) toggleCourse(course.id); };
+          section.appendChild(div);
+        });
+        app.appendChild(section);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", renderCourses);
+
+    const courses = [
+      { id: "D_URBANISTICO", name: "Derecho Urbanístico", level: 9, area: "Electivo - Derecho Público", credits: 3, prereq: ["CIVIL_VII", "ADM_I"] },
+      { id: "D_MUNICIPAL", name: "Derecho Municipal y Gobiernos Locales", level: 9, area: "Electivo - Derecho Público", credits: 3, prereq: ["CONST_II"] },
+      { id: "D_PESQUERO", name: "Derecho Pesquero", level: 9, area: "Electivo - Derecho Público", credits: 3, prereq: ["ADM_I"] },
+      { id: "D_AMBIENTAL", name: "Derecho Ambiental", level: 9, area: "Electivo - Derecho Público", credits: 3, prereq: ["ADM_I"] },
+      { id: "D_COMPETENCIA", name: "Derecho de la Competencia", level: 10, area: "Electivo - Derecho Económico", credits: 3, prereq: ["D_COMERCIAL_I"] },
+      { id: "PROPIEDAD_INTELECTUAL", name: "Propiedad Intelectual", level: 10, area: "Electivo - Derecho Privado", credits: 3, prereq: ["CIVIL_IV"] },
+      { id: "SERVICIOS_PUBLICOS", name: "Servicios Públicos y Concesiones de Bienes Públicos", level: 10, area: "Electivo - Derecho Económico", credits: 3, prereq: ["ADM_II"] },
+      { id: "INGLES_JURIDICO_I", name: "Inglés Jurídico I", level: 10, area: "Electivo - Complementario", credits: 3, prereq: ["CIVIL_VI"] },
+      { id: "D_TECNOLOGIA_I", name: "Derecho y Tecnología I", level: 10, area: "Electivo - Derecho y Tecnología", credits: 3, prereq: ["ADM_II"] },
+      { id: "D_TECNOLOGIA_II", name: "Derecho y Tecnología II", level: 11, area: "Electivo - Derecho y Tecnología", credits: 3, prereq: ["D_TECNOLOGIA_I"] },
+      { id: "FUSIONES_ADQUISICIONES", name: "Fusiones y Adquisiciones", level: 10, area: "Electivo - Derecho Corporativo", credits: 3, prereq: ["D_COMERCIAL_III"] },
+      { id: "D_ENERGIA", name: "Derecho de la Energía", level: 10, area: "Electivo - Derecho Económico", credits: 3, prereq: ["CIVIL_IX"] },
+      { id: "CONTRATOS_BANCARIOS", name: "Contratos Bancarios", level: 11, area: "Electivo - Derecho Corporativo", credits: 3, prereq: ["CIVIL_IX"] },
+      { id: "COMERCIO_INTERNACIONAL", name: "Comercio Internacional", level: 11, area: "Electivo - Derecho Económico", credits: 3, prereq: ["D_COMERCIAL_II"] },
+      { id: "TRIBUTACION_INTERNACIONAL", name: "Tributación Internacional", level: 12, area: "Electivo - Derecho Tributario", credits: 3, prereq: ["TRIB_I"] },
+      { id: "SEMINARIO_CORPORATIVO", name: "Seminario de Derecho Corporativo", level: 12, area: "Electivo - Derecho Corporativo", credits: 3, prereq: ["D_COMERCIAL_III"] },
+      { id: "COOPERACION_INTL", name: "Cooperación Económica Internacional", level: 12, area: "Electivo - Derecho Internacional", credits: 3, prereq: ["INTERNACIONAL_PUB"] },
+      { id: "SEMINARIO_FAMILIA", name: "Seminario de Familia", level: 12, area: "Electivo - Derecho de Familia", credits: 3, prereq: ["CIVIL_VIII"] },
+      { id: "TEMAS_DERECHO_III", name: "Temas de Derecho III", level: 12, area: "Electivo - Variado", credits: 2, prereq: ["CIVIL_VII"] },
+      { id: "TEMAS_DERECHO_IV", name: "Temas de Derecho IV", level: 12, area: "Electivo - Variado", credits: 3, prereq: ["CIVIL_VII"] }
+    ];
+  </script>
+</body>
+</html>
